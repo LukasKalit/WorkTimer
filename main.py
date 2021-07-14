@@ -6,16 +6,26 @@ RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Courier"
-WORK_MIN = 5
+WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 reps = 0
+timer = None
+
+
+# To see how the program work change it to 0.4. By default 60
+time_multiplier = 0.4
 
 # ---------------------------- TIMER RESET ------------------------------- #
 
 
-def reset():
-    pass
+def reset_timer():
+    window.after_cancel(timer)
+    title_label.config(text="Timer", fg=GREEN)
+    check_mark.config(text="")
+    canvas.itemconfig(timer_text, text="00:00")
+    global reps
+    reps = 0
 
 # ---------------------------- TIMER MECHANISM ------------------------------- #
 
@@ -23,9 +33,9 @@ def reset():
 def start_timer():
     global reps
     reps += 1
-    work_sec = WORK_MIN * 1
-    short_break_sec = SHORT_BREAK_MIN * 1
-    long_break_sec = LONG_BREAK_MIN * 1
+    work_sec = int(WORK_MIN * time_multiplier)
+    short_break_sec = int(SHORT_BREAK_MIN * time_multiplier)
+    long_break_sec = int(LONG_BREAK_MIN * time_multiplier)
 
     if reps % 8 == 0:
         count_down(long_break_sec)
@@ -50,8 +60,8 @@ def count_down(count):
         count_sec = f"0{count_sec}"
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
     if count > 0:
-        print("counting")
-        window.after(1000, count_down, count - 1)
+        global timer
+        timer = window.after(1000, count_down, count - 1)
     else:
         start_timer()
         marks = ""
@@ -84,7 +94,7 @@ check_mark.grid(column=2, row=4)
 start_button = Button(text="Start", command=start_timer)
 start_button.grid(column=1, row=3)
 
-reset_button = Button(text="Reset", command=reset)
+reset_button = Button(text="Reset", command=reset_timer)
 reset_button.grid(column=3, row=3)
 
 window.mainloop()
